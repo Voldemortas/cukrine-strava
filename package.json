@@ -12,7 +12,8 @@
     "#src/*": "./build/*"
   },
   "scripts": {
-    "prepare": "bun run src/config/prepare.ts"
+    "prepare": "bun run src/config/prepare.ts",
+    "serve": "pm2 start ecosystem.config.cjs"
   },
   "dependencies": {
     "oauth4webapi": "^2.10.4"
