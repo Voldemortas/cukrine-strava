@@ -10,5 +10,11 @@
   },
   "imports": {
     "#src/*": "./build/*"
+  },
+  "scripts": {
+    "prepare": "bun run src/config/prepare.ts"
+  },
+  "dependencies": {
+    "oauth4webapi": "^2.10.4"
   }
 }

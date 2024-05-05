@@ -1,0 +1,46 @@
+<script>
+  const localData = {
+    stravaAuth: localStorage.getItem('stravaAuth'),
+    dexcomAuth: localStorage.getItem('dexcomAuth'),
+  }
+</script>
+
+<a href="{stravaUrl}">Connect Strava</a> (<span id="stravaAuth"></span>) <br />
+<a href="{dexcomUrl}">Connect Dexcom</a> (<span id="dexcomAuth"></span>) <br />
+<hr />
+
+<form action="/activity" method="post">
+  <input
+    type="text"
+    placeholder="activity id"
+    id="activityId"
+    name="activityId"
+  />
+  <input type="hidden" id="stravaInput" name="stravaAuth" />
+  <input type="hidden" id="dexcomInput" name="dexcomAuth" />
+  <button id="button" type="submit">Parse Data</button>
+</form>
+
+<script>
+  fillSpans('stravaAuth')
+  fillSpans('dexcomAuth')
+
+  if (!localData.dexcomAuth || !localData.stravaAuth) {
+    document.getElementById('activityId').setAttribute('disabled', true)
+    document.getElementById('button').setAttribute('disabled', true)
+  } else {
+    fillInputs('stravaInput', 'stravaAuth')
+    fillInputs('dexcomInput', 'dexcomAuth')
+  }
+
+  function fillSpans(id) {
+    document.getElementById(id).innerText = !!localData[id]
+      ? 'possibly exists'
+      : 'missing'
+  }
+
+  function fillInputs(id, dataId) {
+    document.getElementById(id).value = localData[dataId ?? id]
+  }
+</script>
+

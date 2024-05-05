@@ -1,0 +1,82 @@
+<div>Action: <span id="action">init</span></div>
+<pre
+  style="
+    height: 400px;
+    overflow: auto;
+    border: silver 4px solid;
+    background-color: gray;
+  "
+  id="json"
+></pre>
+
+<script>
+  const actionDiv = document.getElementById('action')
+  const jsonDiv = document.getElementById('json')
+
+  let allData = {
+    time: null,
+    glucose: [],
+    streams: null,
+  }
+
+  async function getTimes() {
+    const activityUrl = `https://www.strava.com/api/v3/activities/{activityId}`
+    const data = await fetch(activityUrl, {
+      headers: {Authorization: `Bearer {stravaAuth}`},
+    })
+    const json = await data.json()
+    const start_date = json.start_date
+    const end_date = new Date(
+      new Date(start_date).getTime() + json.elapsed_time * 1000
+    ).toISOString()
+    return {start_date, end_date}
+  }
+
+  async function getStreams() {
+    const activityUrl = `https://www.strava.com/api/v3/activities/{activityId}/streams?keys=time,heartrate,distance&key_by_type=true`
+    const data = await fetch(activityUrl, {
+      headers: {Authorization: `Bearer {stravaAuth}`},
+    })
+    const json = await data.json()
+    return json
+  }
+
+  async function getGlucose() {
+    const formData = {
+      dexcomAuth: '{dexcomAuth}',
+      startDate: allData.time.start_date.replaceAll(/(\.[\d]+)?Z/g, ''),
+      endDate: allData.time.end_date.replaceAll(/(\.[\d]+)?Z/g, ''),
+    }
+
+    const data = await fetch('/glucose', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: 'follow',
+      referrerPolicy: 'no-referrer',
+      body: new URLSearchParams(formData).toString(),
+    })
+    const json = await data.json()
+    return json.records.map(({systemTime, value}) => ({
+      time: systemTime,
+      value,
+    }))
+  }
+
+  ;(async () => {
+    actionDiv.innerHTML = 'getting activity (1/3)'
+    allData.time = {...(await getTimes())}
+    actionDiv.innerHTML = 'getting glucose (2/3)'
+    allData.glucose = [...(await getGlucose())]
+    actionDiv.innerHTML = 'getting heartRate (3/3)'
+    allData.streams = {...(await getStreams())}
+    actionDiv.innerHTML =
+      'All done, front-end later, enjoy collected data below:'
+    jsonDiv.innerHTML = JSON.stringify(allData, null, 4)
+  })()
+</script>
+

@@ -1,0 +1,12 @@
+export enum ENV_ENUM {
+  DEXCOM_AUTH = 'DEXCOM_AUTH',
+  DEXCOM_SECRET = 'DEXCOM_SECRET',
+  STRAVA_AUTH = 'STRAVA_AUTH',
+  STRAVA_SECRET = 'STRAVA_SECRET',
+  PORT = '3059',
+  URL = 'URL',
+  PROD = 'false',
+}
+
+export type ENV_TYPE = typeof ENV_ENUM
+
